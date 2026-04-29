@@ -1,0 +1,16 @@
+cat > .gitignore << 'EOF'
+.venv/
+__pycache__/
+*.pyc
+.env
+.DS_Store
+node_modules/
+dist/
+build/
+*.pkl
+backend/app/ml/artifacts/*.pkl
+backend/data/knowledge/**/*.html
+backend/data/knowledge/**/*.txt
+postgres_data/
+.vscode/
+EOF
