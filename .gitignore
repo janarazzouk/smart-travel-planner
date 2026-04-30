@@ -1,16 +1,36 @@
 cat > .gitignore << 'EOF'
+# Python
 .venv/
+venv/
 __pycache__/
 *.pyc
+.pytest_cache/
+.ruff_cache/
+
+# Environment variables
 .env
+.env.local
+
+# Mac / editor
 .DS_Store
+.vscode/
+
+# Frontend
 node_modules/
 dist/
 build/
-*.pkl
-backend/app/ml/artifacts/*.pkl
-backend/data/knowledge/**/*.html
-backend/data/knowledge/**/*.txt
+
+
+# Data / generated files
 postgres_data/
-.vscode/
+chroma_db/
+*.sqlite3
+
+# Logs
+logs/
+*.log
+
+# Docker
+.docker/
+
 EOF
