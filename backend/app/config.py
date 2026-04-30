@@ -22,7 +22,8 @@ class Settings(BaseSettings):
 
     # Database
     database_url: str = Field(
-        default="postgresql+asyncpg://postgres:postgres@localhost:5432/smart_travel_planner"
+        # default="postgresql+asyncpg://postgres:postgres@localhost:5432/smart_travel_planner"
+        default="postgresql+psycopg://postgres:YOUR_PASSWORD@localhost:5432/smart_travel_planner"
     )
 
     # Auth
@@ -31,18 +32,35 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 60
 
     # LLM models
+    openai_api_key: str
     cheap_model: str = "gpt-4o-mini"
     strong_model: str = "gpt-4o"
 
+    # Frontend / CORS
+    cors_origins: list[str] = [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ]
+
     # Paths
     project_root: Path = Path(__file__).resolve().parent.parent
-    model_path: Path = project_root / "app" / "ml" / "artifacts" / "best_travel_style_model.pkl"
+
+    ml_model_path: Path = (
+        project_root / "app" / "ml" / "artifacts" / "travel_style_classifier.pkl"
+    )
+
+    feature_columns_path: Path = (
+        project_root / "app" / "ml" / "artifacts" / "feature_columns.pkl"
+    )
 
     # RAG
     embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
     rag_top_k: int = 5
+    chroma_path: Path = project_root / "chroma_db"
+    chroma_collection_name: str = "destinations"
 
     # Weather
+    weather_geocoding_url: str = "https://geocoding-api.open-meteo.com/v1/search"
     weather_base_url: str = "https://api.open-meteo.com/v1/forecast"
     weather_cache_ttl_seconds: int = 600
 
