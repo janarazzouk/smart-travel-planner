@@ -20,11 +20,14 @@ class Settings(BaseSettings):
     # API
     api_prefix: str = "/api"
 
+    gemini_api_key: str
+    gemini_model_name: str = "gemini-2.5-flash-lite"
+
     # Database
-    database_url: str = Field(
-        # default="postgresql+asyncpg://postgres:postgres@localhost:5432/smart_travel_planner"
-        default="postgresql+psycopg://postgres:YOUR_PASSWORD@localhost:5432/smart_travel_planner"
-    )
+    # database_url: str = Field(
+    #     # default="postgresql+asyncpg://postgres:postgres@localhost:5432/smart_travel_planner"
+    #     default="postgresql+psycopg://postgres:YOUR_PASSWORD@localhost:5432/smart_travel_planner"
+    # )
 
     # Auth
     jwt_secret_key: str = Field(default="change-me-in-production")
