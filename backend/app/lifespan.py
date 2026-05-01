@@ -49,6 +49,6 @@ async def lifespan(app: FastAPI):
         app.state.embedder = None
 
         await app.state.http_client.aclose()
-        await app.state.db_engine.dispose()
+       # await app.state.db_engine.dispose()
 
         logger.info("Shutting down %s", settings.app_name)

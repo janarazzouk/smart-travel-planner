@@ -67,7 +67,8 @@ class Settings(BaseSettings):
     weather_base_url: str = "https://api.open-meteo.com/v1/forecast"
     weather_cache_ttl_seconds: int = 600
 
-    # Webhook
+    # Webhoo
+    discord_webhook_url: str | None = None
     webhook_timeout_seconds: float = 10.0
     webhook_max_retries: int = 3
 

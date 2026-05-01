@@ -1,3 +1,4 @@
+import logging
 from fastapi import APIRouter, Depends
 
 from app.agent.graph import build_agent_graph
@@ -9,6 +10,9 @@ from app.dependencies import (
     get_ml_model,
 )
 from app.schemas.agent import AgentRunRequest, AgentRunResponse, ToolLogResponse
+from app.services.webhook import send_discord_webhook
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/agent", tags=["Agent"])
 
@@ -34,6 +38,25 @@ async def run_agent(
             "settings": settings,
         }
     )
+    final_answer = final_state["final_answer"]
+    discord_message = f"""
+    🧳 New Trip Plan
+
+    💬 Trip idea:
+    {payload.input_text}
+
+   📍 Travel recommendation:
+    {final_answer}
+    """.strip()
+
+    try:
+        await send_discord_webhook(
+            webhook_url=settings.discord_webhook_url,
+            content=discord_message[:1900],
+        )
+    except Exception:
+        logger.exception("Webhook failed, but user response will continue.")
+
 
     return AgentRunResponse(
         id=0,
