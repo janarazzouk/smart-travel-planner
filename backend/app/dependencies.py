@@ -17,7 +17,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 def get_app_settings() -> Settings:
     return get_settings()
 
-
+#main helper function ->get a shared object from the app state(request.app.state) where the lifespan.py store things like model , http client , feature columns ,emebedder, llm client )
 def _get_state_value(request: Request, name: str) -> Any:
     value = getattr(request.app.state, name, None)
 

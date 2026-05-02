@@ -4,7 +4,8 @@ from app.tools.classify_style import TOOL_NAME as CLASSIFY_STYLE_TOOL_NAME
 from app.tools.classify_style import classify_style_tool
 from app.tools.destination_search import TOOL_NAME as DESTINATION_SEARCH_TOOL_NAME
 from app.tools.destination_search import destination_search_tool
-
+from app.tools.weather import TOOL_NAME as WEATHER_TOOL_NAME
+from app.tools.weather import weather_tool
 
 ToolFunction = Callable[..., dict[str, Any]]
 
@@ -12,6 +13,7 @@ ToolFunction = Callable[..., dict[str, Any]]
 TOOL_REGISTRY: dict[str, ToolFunction] = {
     CLASSIFY_STYLE_TOOL_NAME: classify_style_tool,
     DESTINATION_SEARCH_TOOL_NAME: destination_search_tool,
+    WEATHER_TOOL_NAME: weather_tool,
 }
 
 
@@ -38,6 +40,11 @@ def list_tools() -> list[dict[str, Any]]:
             "name": "destination_search",
             "description": "Retrieves destination names and countries by travel style.",
             "required_arguments": ["travel_style"],
+        },
+        {
+            "name": "weather",
+            "description": "Gets live weather for a destination city.",
+            "required_arguments": ["city"],
         },
     ]
 
