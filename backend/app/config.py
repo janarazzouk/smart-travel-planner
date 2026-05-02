@@ -35,9 +35,9 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 60
 
     # LLM models
-    openai_api_key: str
-    cheap_model: str = "gpt-4o-mini"
-    strong_model: str = "gpt-4o"
+    #openai_api_key: str
+    #cheap_model: str = "gpt-4o-mini"
+    #strong_model: str = "gpt-4o"
 
     # Frontend / CORS
     cors_origins: list[str] = [
