@@ -1,15 +1,13 @@
 from typing import Any
 
-from google import genai
-from google.genai import types
+from app.llm.feature_extraction import extract_features_with_gemini
+from app.llm.final_answer import generate_final_answer
 
-from app.agent.feature_extraction import extract_features_with_gemini
 from app.agent.tool_executor import (
     run_classify_style_tool,
     run_destination_search_tool,
     run_weather_tool,
 )
-from app.config import get_settings
 
 
 async def extract_inputs_node(state: dict[str, Any]) -> dict[str, Any]:
@@ -47,8 +45,6 @@ async def destination_search_node(state: dict[str, Any]) -> dict[str, Any]:
     result = await run_destination_search_tool(state)
     destinations = result["destinations"]
 
-    selected_destination =  None
-
     tool_log = {
         "tool_name": "destination_search",
         "tool_input": {"travel_style": state["predicted_style"]},
@@ -59,7 +55,7 @@ async def destination_search_node(state: dict[str, Any]) -> dict[str, Any]:
 
     return {
         "destinations": destinations,
-        "selected_destination": selected_destination,
+        "selected_destination": None,
         "tool_logs": state["tool_logs"] + [tool_log],
     }
 
@@ -124,61 +120,8 @@ async def weather_node(state: dict[str, Any]) -> dict[str, Any]:
 
 
 async def final_answer_node(state: dict[str, Any]) -> dict[str, Any]:
-    settings = get_settings()
-    client = genai.Client(api_key=settings.gemini_api_key)
+    final_answer = await generate_final_answer(state)
 
-    prompt = f"""
-You are a smart travel planning assistant.
-
-User request:
-{state.get("input_text")}
-
-Extracted user info:
-- Budget USD: {state.get("budget_usd")}
-- Trip days: {state.get("trip_days")}
-- ML features: {state.get("features")}
-
-ML predicted travel style:
-{state.get("predicted_style")}
-
-Candidate destinations from RAG:
-{state.get("destinations")}
-
-Selected destination:
-None. You must choose the best destination from the candidates.
-
-Live weather results for candidate destinations:
-{state.get("weather_results")}
-
-Errors:
-{state.get("errors")}
-
-Write a helpful final travel plan.
-Do not just list tool outputs.
-
-Important decision rule:
-If the live weather conflicts with the user's preference, explain the conflict and prefer another candidate destination if it is a better match.
-
-Explain:
-1. the recommended destination
-2. why it matches the user
-3. weather situation
-4. budget fit
-5. other possible options if available
-
-Format the answer as clean plain text.
-Do not use Markdown.
-Do not use **, #, or bullet symbols.
-Keep it clear and not too long.
-"""
-
-    response = await client.aio.models.generate_content(
-        model=settings.gemini_model_name,
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            temperature=0.4,
-        ),
-    )
-
-    clean_answer = response.text.replace("\n", " ").strip()
-    return {"final_answer": clean_answer}
+    return {
+        "final_answer": final_answer,
+    }

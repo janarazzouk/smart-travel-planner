@@ -1,8 +1,9 @@
 from pydantic import BaseModel, Field
-from google import genai
 from google.genai import types
 
 from app.config import get_settings
+from app.llm.client import get_gemini_client
+from app.llm.prompts import build_feature_extraction_prompt
 
 
 class ExtractedTravelFeatures(BaseModel):
@@ -41,34 +42,11 @@ def estimate_cost_features(
 
 async def extract_features_with_gemini(input_text: str) -> dict:
     settings = get_settings()
-
-    client = genai.Client(api_key=settings.gemini_api_key)
-
-    prompt = f"""
-Extract travel planning features from this user request.
-
-User request:
-{input_text}
-
-Rules:
-- budget_usd: extract the total budget in USD if mentioned.
-- trip_days: extract trip duration in days. If user says 2 weeks, use 14.
-- All score features must be integers from 0 to 5.
-- 0 means not requested / not important.
-- 2 or 3 = neutral or somewhat important.
-- 5 means very important.
-- tourism_density:
-  - 0 or 1 = wants quiet / not touristy / hidden gems
-  - 3 = neutral
-  - 5 = wants popular / famous / touristy
-- avg_temp_summer_c is only an estimated preference from the text.
-  Example: warm = 28, hot = 32, mild = 22, cold = 10.
-Do not invent budget or days if missing.
-"""
+    client = get_gemini_client()
 
     response = await client.aio.models.generate_content(
         model=settings.gemini_model_name,
-        contents=prompt,
+        contents=build_feature_extraction_prompt(input_text),
         config=types.GenerateContentConfig(
             response_mime_type="application/json",
             response_schema=ExtractedTravelFeatures,
